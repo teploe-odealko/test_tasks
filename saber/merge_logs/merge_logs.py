@@ -1,10 +1,10 @@
 import argparse
 import json
 from datetime import datetime
-from json import JSONDecodeError
 from pathlib import Path
 
 top_str_list = []
+
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Tool to merge logs.')
@@ -89,7 +89,10 @@ def _fill_output_file(list_of_generators, out):
                 return
     elif len(list_of_generators) > 1:
         while True:
-            top_str_time_list = list(map(lambda x: datetime.strptime(x['timestamp'], "%Y-%m-%d %H:%M:%S"), top_str_list))
+            top_str_time_list = list(
+                map(lambda x: datetime.strptime(x['timestamp'], "%Y-%m-%d %H:%M:%S"),
+                    top_str_list)
+            )
             index_min = min(range(len(top_str_time_list)), key=top_str_time_list.__getitem__)
             out.write(str(top_str_list[index_min]))
             out.write('\n')
@@ -99,7 +102,6 @@ def _fill_output_file(list_of_generators, out):
                 list_of_generators.pop(index_min)
                 _fill_output_file(list_of_generators, out)
                 break
-
 
 
 if __name__ == '__main__':
@@ -112,8 +114,3 @@ if __name__ == '__main__':
 
     with open(merged_log, 'w') as out:
         _fill_output_file(logs_generators, out)
-
-
-
-
-
