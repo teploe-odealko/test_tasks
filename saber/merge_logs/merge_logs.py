@@ -2,6 +2,7 @@ import argparse
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import Generator, TextIO
 
 top_str_list = []
 
@@ -56,7 +57,7 @@ def _if_file_exist(path: Path):
             f'File "{path}" does not exists. Choose another file path.')
 
 
-def _preprocess_args(args):
+def _preprocess_args(args: argparse.Namespace) -> tuple:
     merged_log = Path(args.merged_log)
     files_to_merge = list(map(Path, (args.log1, args.log2)))
 
@@ -66,7 +67,7 @@ def _preprocess_args(args):
     return merged_log, files_to_merge
 
 
-def _file_reader_generator(file_path):
+def _file_reader_generator(file_path: Path) -> Generator[dict, None, None]:
     with open(file_path, 'r') as json_file:
         json_list = list(json_file)
 
@@ -75,7 +76,7 @@ def _file_reader_generator(file_path):
         yield result
 
 
-def _fill_output_file(list_of_generators, out):
+def _fill_output_file(list_of_generators: list, out: TextIO) -> None:
     if len(list_of_generators) == 0:
         return
     elif len(list_of_generators) == 1:
@@ -93,7 +94,7 @@ def _fill_output_file(list_of_generators, out):
                 map(lambda x: datetime.strptime(x['timestamp'], "%Y-%m-%d %H:%M:%S"),
                     top_str_list)
             )
-            index_min = min(range(len(top_str_time_list)), key=top_str_time_list.__getitem__)
+            index_min = int(min(range(len(top_str_time_list)), key=top_str_time_list.__getitem__))
             out.write(str(top_str_list[index_min]))
             out.write('\n')
             try:
