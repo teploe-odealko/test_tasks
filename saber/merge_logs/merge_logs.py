@@ -86,6 +86,7 @@ def _fill_output_file(list_of_generators: list, out: TextIO) -> None:
             try:
                 log_str = next(list_of_generators[0])
                 out.write(str(log_str))
+                out.write('\n')
             except StopIteration:
                 return
     elif len(list_of_generators) > 1:
@@ -94,12 +95,14 @@ def _fill_output_file(list_of_generators: list, out: TextIO) -> None:
                 map(lambda x: datetime.strptime(x['timestamp'], "%Y-%m-%d %H:%M:%S"),
                     top_str_list)
             )
+
             index_min = int(min(range(len(top_str_time_list)), key=top_str_time_list.__getitem__))
             out.write(str(top_str_list[index_min]))
             out.write('\n')
             try:
                 top_str_list[index_min] = next(list_of_generators[index_min])
             except StopIteration:
+                top_str_list.pop(index_min)
                 list_of_generators.pop(index_min)
                 _fill_output_file(list_of_generators, out)
                 break
